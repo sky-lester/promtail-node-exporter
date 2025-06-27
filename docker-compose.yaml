@@ -1,0 +1,25 @@
+services:
+  promtail:
+    image: grafana/promtail:latest
+    container_name: promtail
+    restart: unless-stopped
+    volumes:
+      - ./promtail-config.yaml:/etc/promtail/config.yaml.template
+      - /var/log:/var/log
+    environment:
+      - LOKI_SERVER_IP=${LOKI_SERVER_IP}
+    entrypoint: |
+      /bin/sh -c "envsubst < /etc/promtail/config.yaml.template > /etc/promtail/config.yaml && exec /usr/bin/promtail -config.file=/etc/promtail/config.yaml"
+
+  node_exporter:
+    image: quay.io/prometheus/node-exporter:latest
+    container_name: node_exporter
+    restart: unless-stopped
+    network_mode: host
+    pid: host
+    volumes:
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /:/rootfs:ro
+    command:
+      - '--path.rootfs=/rootfs'
