@@ -9,10 +9,10 @@ if [ -z "$1" ]; then
 fi
 
 LOKI_IP="$1"
-INSTALL_DIR="/opt/prometheus_agent"
+INSTALL_DIR="/etc/promtail"
 PROMTAIL_CONFIG="$INSTALL_DIR/promtail-config.yaml"
 NODE_EXPORTER_VERSION="1.8.0"
-PROMTAIL_VERSION="2.10.0"
+PROMTAIL_VERSION="3.4.4"
 
 echo "[INFO] Installing Promtail and Node Exporter"
 echo "[INFO] Loki Server IP: $LOKI_IP"
@@ -42,14 +42,18 @@ cd "$INSTALL_DIR"
 echo "[INFO] Downloading Node Exporter v$NODE_EXPORTER_VERSION..."
 curl -LO "https://github.com/prometheus/node_exporter/releases/download/v${NODE_EXPORTER_VERSION}/node_exporter-${NODE_EXPORTER_VERSION}.linux-amd64.tar.gz"
 tar -xzf "node_exporter-${NODE_EXPORTER_VERSION}.linux-amd64.tar.gz"
+echo "[INFO] Stopping Node Exporter if running to avoid file lock..."
+
+sudo systemctl stop node_exporter || true
+
 sudo cp "node_exporter-${NODE_EXPORTER_VERSION}.linux-amd64/node_exporter" /usr/local/bin/
 rm -rf "node_exporter-${NODE_EXPORTER_VERSION}.linux-amd64"*
 
 # === Download Promtail ===
 echo "[INFO] Downloading Promtail v$PROMTAIL_VERSION..."
-curl -LO "https://github.com/grafana/loki/releases/download/v${PROMTAIL_VERSION}/promtail-linux-amd64.zip"
-unzip promtail-linux-amd64.zip
-chmod +x promtail-linux-amd64
+sudo curl -LO "https://github.com/grafana/loki/releases/download/v${PROMTAIL_VERSION}/promtail-linux-amd64"
+sudo unzip promtail-linux-amd64
+sudo chmod +x promtail-linux-amd64
 sudo mv promtail-linux-amd64 /usr/local/bin/promtail
 rm promtail-linux-amd64.zip
 
