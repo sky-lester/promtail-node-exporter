@@ -30,7 +30,7 @@ fi
 
 # === Install missing tools ===
 echo "[INFO] Installing curl and unzip if missing..."
-sudo $PKG_MGR install -y curl unzip
+sudo $PKG_MGR install -y curl unzip --disablerepo=pgdg\*
 
 # === Create install directory ===
 sudo mkdir -p "$INSTALL_DIR"
@@ -40,8 +40,8 @@ cd "$INSTALL_DIR"
 
 # === Download Node Exporter ===
 echo "[INFO] Downloading Node Exporter v$NODE_EXPORTER_VERSION..."
-curl -LO "https://github.com/prometheus/node_exporter/releases/download/v${NODE_EXPORTER_VERSION}/node_exporter-${NODE_EXPORTER_VERSION}.linux-amd64.tar.gz"
-tar -xzf "node_exporter-${NODE_EXPORTER_VERSION}.linux-amd64.tar.gz"
+sudo wget "https://github.com/prometheus/node_exporter/releases/download/v${NODE_EXPORTER_VERSION}/node_exporter-${NODE_EXPORTER_VERSION}.linux-amd64.tar.gz"
+sudo tar -xzf "node_exporter-${NODE_EXPORTER_VERSION}.linux-amd64.tar.gz"
 echo "[INFO] Stopping Node Exporter if running to avoid file lock..."
 
 sudo systemctl stop node_exporter || true
@@ -51,8 +51,8 @@ rm -rf "node_exporter-${NODE_EXPORTER_VERSION}.linux-amd64"*
 
 # === Download Promtail ===
 echo "[INFO] Downloading Promtail v$PROMTAIL_VERSION..."
-sudo curl -LO "https://github.com/grafana/loki/releases/download/v${PROMTAIL_VERSION}/promtail-linux-amd64"
-sudo unzip promtail-linux-amd64
+sudo wget "https://github.com/grafana/loki/releases/download/v${PROMTAIL_VERSION}/promtail-linux-amd64.zip"
+sudo unzip promtail-linux-amd64.zip
 sudo chmod +x promtail-linux-amd64
 sudo mv promtail-linux-amd64 /usr/local/bin/promtail
 rm promtail-linux-amd64.zip
